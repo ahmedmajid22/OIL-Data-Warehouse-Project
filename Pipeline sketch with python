@@ -1,35 +1,40 @@
 import os
-from diagrams import Cluster, Diagram, Edge
+from diagrams import Cluster, Diagram
 from diagrams.onprem.database import MySQL, PostgreSQL
 from diagrams.onprem.analytics import PowerBI
-from diagrams.onprem.compute import Server
 from diagrams.generic.storage import Storage
 from diagrams.generic.compute import Rack
 
 # Ensure the Graphviz executable is in the PATH
-os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
+os.environ["PATH"] += os.pathsep + r"C:/Program Files/Graphviz/bin"
 
 with Diagram("ETL Pipeline for Data Warehouse", show=False):
+    
+    # Data Sources
     with Cluster("Data Sources"):
-        access_db = Storage("Access DB (Historical)")
-        mysql_db = MySQL("MySQL DB (Real-time)")
+        access_db = Storage("Access DB\n(Historical)")
+        mysql_db = MySQL("MySQL DB\n(Real-time)")
 
+    # Staging Area
     with Cluster("Staging Area"):
         staging = Storage("Staging")
 
+    # ETL Process
     with Cluster("ETL Process"):
         extract = Rack("Extract")
         transform = Rack("Transform")
         load = Rack("Load")
 
+    # Data Warehouse
     with Cluster("Data Warehouse"):
         dim_tables = PostgreSQL("Dimension Tables")
         fact_tables = PostgreSQL("Fact Tables")
 
+    # Visualization
     with Cluster("Visualization"):
         power_bi = PowerBI("Power BI")
 
-    # Data flow
+    # Data flow connections
     access_db >> extract >> staging
     mysql_db >> extract >> staging
     staging >> transform >> dim_tables
